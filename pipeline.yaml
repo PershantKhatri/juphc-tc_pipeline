@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: web-app-pipeline
+spec:
+  workspaces:
+    - name: shared-workspace
+  tasks:
+    - name: npm-install
+      taskRef:
+        name: npm-task
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+          
+    - name: tests
+      taskRef:
+        name: jasmine-task
+      runAfter:
+        - npm-install
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
+    - name: build
+      taskRef:
+        name: build-task
+      runAfter:
+        - tests
+      workspaces:
+        - name: output
+          workspace: shared-workspace
